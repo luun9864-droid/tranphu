@@ -3,248 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trần Phú Music | HL Group</title>
+    <title>TRẦN PHÚ MUSIC | CLB TRUYỀN THÔNG</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root {
-            --green: #1DB954;
-            --black: #000000;
-            --dark: #121212;
-            --light: #282828;
-            --glass: rgba(255, 255, 255, 0.1);
-        }
+        :root { --p: #1DB954; --bg: #050505; --card: #121212; --glass: rgba(255, 255, 255, 0.05); }
+        body, html { margin: 0; padding: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: white; height: 100vh; overflow: hidden; }
 
-        body, html { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; background: var(--black); color: white; height: 100vh; overflow: hidden; }
+        /* HIỆU ỨNG NỀN NỐT NHẠC */
+        #bg-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .floating-note { position: absolute; color: var(--p); opacity: 0.1; animation: float 20s infinite linear; font-size: 20px; }
+        @keyframes float { 0% { transform: translateY(110vh) rotate(0deg); } 100% { transform: translateY(-10vh) rotate(360deg); } }
 
-        /* Hiệu ứng nốt nhạc bay nền */
-        #bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .note { position: absolute; color: var(--green); font-size: 20px; opacity: 0.2; animation: fly 12s linear infinite; }
-        @keyframes fly {
-            0% { transform: translateY(105vh) rotate(0deg); opacity: 0; }
-            50% { opacity: 0.4; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        /* MÀN HÌNH ĐĂNG NHẬP HIỆN ĐẠI */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
         }
-
-        /* --- MÀN HÌNH ĐĂNG NHẬP --- */
-        #auth-page {
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            height: 100vh; width: 100%; background: radial-gradient(circle at center, #1a1a1a, #000);
-            position: fixed; top: 0; left: 0; z-index: 1000; transition: 0.8s ease-in-out;
+        .login-card { 
+            background: var(--glass); backdrop-filter: blur(25px); padding: 50px; 
+            border-radius: 30px; width: 350px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
         }
-        .auth-box {
-            background: var(--glass); backdrop-filter: blur(15px); padding: 40px;
-            border-radius: 20px; width: 320px; text-align: center; border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-        }
-
-        /* --- GIAO DIỆN CHÍNH --- */
-        #main-app { display: none; height: 100vh; flex-direction: row; width: 100%; }
+        #quote-text { font-style: italic; color: #888; font-size: 14px; margin-bottom: 30px; line-height: 1.6; height: 45px; display: flex; align-items: center; justify-content: center; }
         
-        .sidebar { width: 240px; background: #000; padding: 25px; display: flex; flex-direction: column; border-right: 1px solid #222; box-sizing: border-box; }
-        .sidebar h2 { color: var(--green); margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; gap: 10px; }
-        
-        .nav-link { 
-            padding: 12px 15px; color: #b3b3b3; cursor: pointer; border-radius: 5px; 
-            transition: 0.3s; margin-bottom: 8px; font-weight: bold; display: flex; align-items: center; gap: 12px;
+        input { 
+            width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; 
+            border: 1px solid #333; background: rgba(0,0,0,0.3); color: white; box-sizing: border-box; outline: none; transition: 0.3s;
         }
-        .nav-link:hover, .nav-link.active { color: white; background: var(--light); }
+        input:focus { border-color: var(--p); background: rgba(29, 185, 84, 0.05); }
+        .btn-entry { 
+            background: var(--p); color: #000; border: none; padding: 16px; 
+            border-radius: 15px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 20px; font-size: 16px; letter-spacing: 1px; transition: 0.3s;
+        }
+        .btn-entry:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(29, 185, 84, 0.3); }
 
-        .content { flex: 1; background: linear-gradient(to bottom, #181818, #121212); overflow-y: auto; padding: 40px; padding-bottom: 100px; box-sizing: border-box; }
+        /* GIAO DIỆN CHÍNH */
+        #main-layout { display: none; height: 100vh; flex-direction: row; opacity: 0; transition: 1s ease; }
+        .sidebar { width: 280px; background: #000; padding: 30px; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+        .nav-link { padding: 14px 20px; color: #aaa; cursor: pointer; border-radius: 12px; margin-bottom: 8px; font-weight: 600; display: flex; align-items: center; gap: 15px; transition: 0.3s; }
+        .nav-link:hover, .nav-link.active { color: white; background: #1a1a1a; }
+        .nav-link i { font-size: 18px; color: var(--p); }
 
-        /* Form & Card */
-        .card { background: var(--light); padding: 25px; border-radius: 12px; border: 1px solid #333; margin-bottom: 25px; transition: 0.3s; }
-        .card:hover { transform: translateY(-5px); border-color: var(--green); }
+        .viewport { flex: 1; background: linear-gradient(180deg, #121212 0%, #050505 100%); overflow-y: auto; padding: 40px; padding-bottom: 120px; }
+        .welcome-banner { background: linear-gradient(135deg, #1db95444 0%, transparent 100%); padding: 40px; border-radius: 25px; border: 1px solid #222; margin-bottom: 40px; }
+        
+        /* Video Grid */
+        .section-header { font-size: 22px; font-weight: 800; margin: 40px 0 20px; display: flex; align-items: center; gap: 12px; color: #fff; }
+        .music-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 25px; }
+        .music-card { background: #181818; border-radius: 15px; overflow: hidden; border: 1px solid #252525; cursor: pointer; transition: 0.4s; position: relative; }
+        .music-card:hover { background: #222; transform: translateY(-10px); border-color: var(--p); }
+        .music-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; border-bottom: 1px solid #252525; }
+        .music-card p { padding: 15px; font-size: 14px; margin: 0; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        input { width: 100%; padding: 12px 20px; margin: 10px 0; border-radius: 30px; border: none; background: #3e3e3e; color: white; box-sizing: border-box; outline: none; }
-        input:focus { background: #444; border: 1px solid var(--green); }
-
-        .btn-green { background: var(--green); color: black; border: none; padding: 12px; border-radius: 30px; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%; }
-        .btn-green:hover { transform: scale(1.05); background: #1ed760; }
-
-        footer { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); padding: 15px 40px; border-top: 1px solid #222; display: flex; justify-content: space-between; font-size: 12px; color: #888; z-index: 100; box-sizing: border-box; }
-
+        footer { position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); padding: 20px 50px; border-top: 1px solid #1a1a1a; font-size: 13px; color: #666; display: flex; justify-content: space-between; align-items: center; z-index: 1000; box-sizing: border-box; }
         .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div id="bg-animation"></div>
+    <div id="bg-canvas"></div>
 
-    <div id="auth-page">
-        <div class="auth-box">
-            <h1 style="margin:0; color: var(--green);">TP Music</h1>
-            <p id="quote-display" style="font-style: italic; font-size: 13px; color: #aaa; margin: 20px 0;"></p>
-            <input type="text" id="reg-name" placeholder="Họ và tên">
-            <input type="text" id="reg-class" placeholder="Lớp">
-            <input type="password" id="reg-pass" placeholder="Mật khẩu">
-            <button class="btn-green" onclick="handleLogin()">BẮT ĐẦU TRẢI NGHIỆM</button>
+    <div id="login-screen">
+        <div class="login-card">
+            <div style="background: var(--p); width: 60px; height: 60px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; color: black; font-size: 25px;">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            <h1 style="color: white; margin: 0; font-size: 28px; letter-spacing: -1px;">TRẦN PHÚ MUSIC</h1>
+            <div id="quote-text">"Âm nhạc khởi đầu nơi ngôn từ kết thúc."</div>
+            
+            <input type="text" id="ipt-user" placeholder="Họ và tên..." autocomplete="off">
+            <input type="text" id="ipt-class" placeholder="Lớp học..." autocomplete="off">
+            <input type="password" id="ipt-pass" placeholder="Mật khẩu" autocomplete="new-password">
+            
+            <button class="btn-entry" onclick="launchApp()">KHÁM PHÁ NGAY</button>
         </div>
     </div>
 
-    <div id="main-app">
+    <div id="main-layout">
         <div class="sidebar">
-            <h2><i class="fa-solid fa-compact-disc fa-spin"></i> TP Music</h2>
-            <div id="nav-home" class="nav-link active" onclick="changeTab('home')"><i class="fa-solid fa-house"></i> Trang Chủ</div>
-            <div id="nav-history" class="nav-link" onclick="changeTab('history')"><i class="fa-solid fa-clock-rotate-left"></i> Lịch Sử</div>
-            <div id="nav-profile" class="nav-link" onclick="changeTab('profile')"><i class="fa-solid fa-user"></i> Tài Khoản</div>
-            <div id="admin-tab" class="nav-link" style="display:none; color:#ff4757" onclick="changeTab('admin')"><i class="fa-solid fa-crown"></i> QUẢN TRỊ</div>
+            <h2 style="color: var(--p); margin-bottom: 40px; font-size: 24px;"><i class="fa-solid fa-radio"></i> TP MUSIC</h2>
+            <div class="nav-link active" onclick="nav('home', event)"><i class="fa-solid fa-compass"></i> Trang Chủ</div>
+            <div class="nav-link" onclick="nav('history', event)"><i class="fa-solid fa-list-ul"></i> Lịch Sử</div>
+            <div class="nav-link" onclick="nav('profile', event)"><i class="fa-solid fa-user-circle"></i> Cá Nhân</div>
+            <div id="adm-nav" class="nav-link" style="display:none; color: #ff4d4d;" onclick="nav('admin', event)"><i class="fa-solid fa-star"></i> QUẢN TRỊ</div>
             
-            <button class="btn-green" style="background:#333; color:white; margin-top:auto" onclick="location.reload()">Đăng xuất</button>
+            <button class="btn-entry" style="background:#1a1a1a; color:white; margin-top:auto" onclick="location.reload()">Đăng xuất</button>
         </div>
 
-        <div class="content">
-            <div id="tab-home" class="tab-content">
-                <div class="card" style="background: linear-gradient(135deg, #1db95433, transparent) !important;">
-                    <h1 style="margin:0">Chào mừng, <span id="user-display"></span>!</h1>
-                    <p>Hãy gửi bài hát bạn yêu thích để CLB Truyền Thông phát nhé.</p>
-                    <div style="display:flex; gap:10px; margin-top:20px;">
-                        <input type="text" id="song-name" placeholder="Tên bài hát - Ca sĩ..." style="margin:0; flex:1; text-align:left; padding-left:20px;">
-                        <button class="btn-green" style="width:140px;" onclick="registerMusic()">Gửi Nhạc</button>
+        <div class="viewport">
+            <div id="view-home" class="view">
+                <div class="welcome-banner">
+                    <h1 style="margin:0; font-size: 35px;">Chào, <span id="user-name-tag" style="color:var(--p)"></span>!</h1>
+                    <p style="color:#888; font-size: 16px;">Gửi bài hát yêu thích cho <b>CLB Truyền thông</b> ngay bây giờ.</p>
+                    <div style="display:flex; gap:15px; margin-top:30px; max-width: 700px;">
+                        <input type="text" id="song-req" placeholder="Tên bài hát bạn muốn nghe..." style="margin:0; flex:1; background: rgba(0,0,0,0.5);">
+                        <button class="btn-entry" style="width:150px; margin:0;" onclick="submitReq()">GỬI YÊU CẦU</button>
                     </div>
                 </div>
-                <h3>Gợi ý nổi bật</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
-                    <div class="card"><img src="https://img.youtube.com/vi/kJQP7kiw5Fk/mqdefault.jpg" style="width:100%; border-radius:8px;"><p>Despacito</p></div>
-                    <div class="card"><img src="https://img.youtube.com/vi/JGwWNGJdvx8/mqdefault.jpg" style="width:100%; border-radius:8px;"><p>Shape of You</p></div>
-                </div>
+
+                <div class="section-header"><i class="fa-solid fa-globe-americas"></i> Âm Nhạc Quốc Tế</div>
+                <div class="music-grid" id="grid-intl"></div>
+
+                <div class="section-header"><i class="fa-solid fa-heart"></i> Âm Nhạc Việt Nam</div>
+                <div class="music-grid" id="grid-vn"></div>
+
+                <div class="section-header"><i class="fa-solid fa-bolt"></i> Xu Hướng TikTok</div>
+                <div class="music-grid" id="grid-tiktok"></div>
             </div>
 
-            <div id="tab-history" class="tab-content hidden">
-                <h2>Lịch sử đăng ký của bạn</h2>
-                <div id="history-list">Bạn chưa gửi yêu cầu nào.</div>
+            <div id="view-history" class="view hidden">
+                <h2 style="font-size: 30px;">Yêu cầu của bạn</h2>
+                <div id="hist-list">Chưa có bài hát nào được gửi.</div>
             </div>
 
-            <div id="tab-profile" class="tab-content hidden">
-                <h2>Thông tin cá nhân</h2>
-                <div class="card">
-                    <p>Họ tên: <b id="prof-name"></b></p>
-                    <p>Lớp: <b id="prof-class"></b></p>
-                    <p>Điểm đóng góp: <span style="color:var(--green); font-weight:bold;"><span id="prof-points">0</span> 🎵</span></p>
-                </div>
+            <div id="view-profile" class="view hidden">
+                <h2 style="font-size: 30px;">Thông tin học sinh</h2>
+                <div id="prof-card" style="background:var(--card); padding:30px; border-radius:20px; border: 1px solid #333;"></div>
             </div>
 
-            <div id="tab-admin" class="tab-content hidden">
-                <h1 style="color:#ff4757">Bảng Điều Khiển Admin</h1>
-                <div class="card">
-                    <h3>Danh sách bài hát chờ phát</h3>
-                    <div id="admin-req-list"></div>
-                </div>
+            <div id="view-admin" class="view hidden">
+                <h2 style="color:#ff4d4d; font-size: 30px;">Danh sách tổng hợp (Admin)</h2>
+                <div id="adm-list"></div>
             </div>
         </div>
     </div>
 
+    <div id="player-zone"></div>
+
     <footer>
-        <div>Nhà Điều Hành: <b>clbtruyenthongso1tranphu</b></div>
-        <div>&copy; 2026 Bản Quyền: <b>HL Group</b></div>
+        <div>Vận hành bởi: <b>CLB Truyền thông - THPT Số 1 Trần Phú</b></div>
+        <div style="color:var(--p)"><i class="fa-solid fa-wave-square"></i> TRẦN PHÚ MUSIC 2026</div>
+        <div>&copy; <b>HL Group</b></div>
     </footer>
 
     <script>
-        // 1. Hiệu ứng nốt nhạc bay
-        const bg = document.getElementById('bg-animation');
-        for(let i=0; i<15; i++){
-            const n = document.createElement('i');
-            n.className = 'fa-solid fa-music note';
-            n.style.left = Math.random()*100 + 'vw';
-            n.style.animationDelay = Math.random()*10 + 's';
-            bg.appendChild(n);
+        // 1. Tạo nốt nhạc bay
+        const canvas = document.getElementById('bg-canvas');
+        for(let i=0; i<20; i++) {
+            const note = document.createElement('i');
+            note.className = 'fa-solid fa-music floating-note';
+            note.style.left = Math.random() * 100 + 'vw';
+            note.style.animationDelay = Math.random() * 15 + 's';
+            note.style.fontSize = Math.random() * 20 + 10 + 'px';
+            canvas.appendChild(note);
         }
 
-        // 2. Câu trích dẫn
-        const quotes = ["Âm nhạc là ngôn ngữ của tâm hồn.", "Nơi lời nói thất bại, âm nhạc lên tiếng.", "Âm nhạc là cách cảm xúc trở thành âm thanh."];
-        document.getElementById('quote-display').innerText = quotes[Math.floor(Math.random()*quotes.length)];
+        // 2. Câu nói mỗi ngày
+        const quotes = [
+            "Hôm nay bạn muốn nghe gì tại Trần Phú?",
+            "Âm nhạc là cách cảm xúc được lắng nghe.",
+            "CLB Truyền thông luôn đồng hành cùng bạn.",
+            "Hãy để âm nhạc làm bừng sáng giờ ra chơi.",
+            "Trần Phú Music - Nơi tài năng thăng hoa."
+        ];
+        document.getElementById('quote-text').innerText = quotes[Math.floor(Math.random()*quotes.length)];
 
-        // 3. Quản lý dữ liệu
-        let user = { name: "", class: "", points: 0, history: [], isAdmin: false };
-        let allRequests = JSON.parse(localStorage.getItem('tp_requests')) || [];
+        // 3. Dữ liệu âm nhạc (ID Video YouTube mới nhất)
+        const musicData = {
+            intl: [{id:'kJQP7kiw5Fk', t:'Despacito'}, {id:'JGwWNGJdvx8', t:'Shape of You'}, {id:'09R8_2nJtjg', t:'Sugar'}, {id:'fRh_vgS2dFE', t:'Sorry'}, {id:'OPf0YbXqDm0', t:'Uptown Funk'}],
+            vn: [{id:'kJWQ5qcl6KY', t:'Nấu Ăn Cho Em'}, {id:'gaG0v-Lp1t8', t:'Waiting For You'}, {id:'mSstC_O-pXg', t:'Mưa Tháng Sáu'}, {id:'L7S_hS3V8eE', t:'Cắt Đôi Nỗi Sầu'}, {id:'uH6v97D0f8o', t:'Lệ Lưu Ly'}],
+            tiktok: [{id:'W9P_qXJJn6U', t:'TikTok Mix 2026'}, {id:'4fedeDqN6dU', t:'Speed Up Viral'}, {id:'6v2L2UGZJAM', t:'Trend TikTok Hot'}, {id:'S_fAn_YFqQA', t:'Best of TikTok'}, {id:'9fI6NqA8jX0', t:'Hot Trend Dance'}]
+        };
 
-        // 4. HÀM ĐĂNG NHẬP (Đã fix lỗi)
-        function handleLogin() {
-            const nameInp = document.getElementById('reg-name').value.trim();
-            const passInp = document.getElementById('reg-pass').value;
-            const classInp = document.getElementById('reg-class').value.trim();
+        let session = { name: "", class: "", history: [], isAdmin: false };
+        let db = JSON.parse(localStorage.getItem('tp_music_final_v2')) || [];
 
-            if(!nameInp) return alert("Vui lòng nhập tên!");
+        // 4. HÀM ĐĂNG NHẬP (LÀM LẠI 100%)
+        function launchApp() {
+            const userInp = document.getElementById('ipt-user').value.trim();
+            const classInp = document.getElementById('ipt-class').value.trim();
+            const passInp = document.getElementById('ipt-pass').value;
 
-            if(nameInp === 'admin' && passInp === '1234') {
-                user = { name: "Quản Trị Viên", class: "HL Group", points: 999, isAdmin: true, history: [] };
-                document.getElementById('admin-tab').style.display = 'flex';
+            if(!userInp) { alert("Vui lòng cho biết tên bạn nhé!"); return; }
+
+            // Logic đăng nhập
+            if(userInp.toLowerCase() === 'admin' && passInp === '1234') {
+                session.name = "Ban Quản Trị"; session.isAdmin = true;
+                document.getElementById('adm-nav').style.display = 'flex';
             } else {
-                user.name = nameInp;
-                user.class = classInp;
+                session.name = userInp; session.class = classInp || "Học sinh";
             }
 
-            // Chuyển trang mượt mà
-            document.getElementById('auth-page').style.opacity = '0';
+            // Kích hoạt nhạc (Lo-fi cực chill)
+            const playlist = ['jfKfPfyJRdk', 'Lfj26YyvTWA', '5qap5aO4i9A'];
+            const rid = playlist[Math.floor(Math.random() * playlist.length)];
+            document.getElementById('player-zone').innerHTML = `
+                <iframe width="0" height="0" 
+                src="https://www.youtube.com/embed/${rid}?autoplay=1&loop=1&playlist=${rid}" 
+                frameborder="0" allow="autoplay"></iframe>`;
+
+            // Chuyển màn hình
+            document.getElementById('login-screen').style.opacity = '0';
             setTimeout(() => {
-                document.getElementById('auth-page').style.display = 'none';
-                document.getElementById('main-app').style.display = 'flex';
-                updateUI();
-            }, 600);
+                document.getElementById('login-screen').style.display = 'none';
+                const main = document.getElementById('main-layout');
+                main.style.display = 'flex';
+                setTimeout(() => main.style.opacity = '1', 50);
+                document.getElementById('user-name-tag').innerText = session.name;
+                refreshUI();
+            }, 500);
         }
 
-        // 5. HÀM CHUYỂN TAB (Đã fix lỗi)
-        function changeTab(tabId) {
-            // Ẩn tất cả tab
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
-            // Hiện tab được chọn
-            document.getElementById('tab-' + tabId).classList.remove('hidden');
-
-            // Cập nhật trạng thái Sidebar
-            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
-            document.getElementById('nav-' + (tabId === 'admin' ? 'admin-tab' : tabId)).classList.add('active');
-        }
-
-        // 6. ĐĂNG KÝ NHẠC
-        function registerMusic() {
-            const songName = document.getElementById('song-name').value.trim();
-            if(!songName) return alert("Bạn chưa nhập tên bài hát!");
-
-            const req = {
-                user: user.name,
-                class: user.class,
-                song: songName,
-                time: new Date().toLocaleString('vi-VN')
+        function refreshUI() {
+            const fill = (elId, list) => {
+                document.getElementById(elId).innerHTML = list.map(v => `
+                    <div class="music-card" onclick="window.open('https://www.youtube.com/watch?v=${v.id}')">
+                        <img src="https://i.ytimg.com/vi/${v.id}/hqdefault.jpg" onerror="this.src='https://via.placeholder.com/300x170/111/white?text=TP+Music'">
+                        <p>${v.t}</p>
+                    </div>
+                `).join('');
             };
+            fill('grid-intl', musicData.intl);
+            fill('grid-vn', musicData.vn);
+            fill('grid-tiktok', musicData.tiktok);
 
-            allRequests.push(req);
-            localStorage.setItem('tp_requests', JSON.stringify(allRequests));
+            document.getElementById('prof-card').innerHTML = `
+                <p style="font-size: 18px;"><b><i class="fa-solid fa-user"></i> Họ tên:</b> ${session.name}</p>
+                <p style="font-size: 18px;"><b><i class="fa-solid fa-school"></i> Lớp:</b> ${session.class}</p>
+                <p style="color:var(--p)"><b><i class="fa-solid fa-check-circle"></i> Trạng thái:</b> Thành viên CLB Truyền thông</p>
+            `;
+            
+            document.getElementById('hist-list').innerHTML = session.history.length ? 
+                session.history.map(h => `<div style="padding:15px; background:#1a1a1a; margin-bottom:10px; border-radius:12px; border-left:5px solid var(--p)">${h}</div>`).reverse().join('') : "Bạn chưa gửi bài hát nào.";
 
-            if(!user.isAdmin) {
-                user.points += 100;
-                user.history.push(req);
-            }
-
-            // Gửi ngầm thông báo về Email
-            fetch("https://formspree.io/f/luun9864@gmail.com", {
-                method: "POST",
-                body: JSON.stringify(req),
-                headers: { 'Accept': 'application/json' }
-            });
-
-            alert("Gửi thành công! +100 điểm âm nhạc 🎵");
-            document.getElementById('song-name').value = "";
-            updateUI();
-        }
-
-        function updateUI() {
-            document.getElementById('user-display').innerText = user.name;
-            document.getElementById('prof-name').innerText = user.name;
-            document.getElementById('prof-class').innerText = user.class || "Chưa nhập";
-            document.getElementById('prof-points').innerText = user.points;
-
-            // Render lịch sử cá nhân
-            const hList = document.getElementById('history-list');
-            hList.innerHTML = user.history.length ? 
-                user.history.map(h => `<div class="card"><b>${h.song}</b><br><small>${h.time}</small></div>`).reverse().join('') : "Trống...";
-
-            // Render danh sách Admin
-            if(user.isAdmin) {
-                document.getElementById('admin-req-list').innerHTML = allRequests.map(r => `
-                    <div style="border-bottom:1px solid #333; padding:10px;">
-                        <b>${r.user} (${r.class})</b>: <span style="color:var(--green)">${r.song}</span><br><small>${r.time}</small>
+            if(session.isAdmin) {
+                document.getElementById('adm-list').innerHTML = db.map(d => `
+                    <div style="padding:15px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center;">
+                        <div><b>${d.u} (${d.c})</b> gửi: <span style="color:var(--p)">${d.s}</span></div>
+                        <small style="color:#555">${d.t}</small>
                     </div>
                 `).reverse().join('');
             }
+        }
+
+        function nav(tabId, e) {
+            document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+            document.getElementById('view-' + tabId).classList.remove('hidden');
+            document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+        }
+
+        function submitReq() {
+            const s = document.getElementById('song-req').value.trim();
+            if(!s) return alert("Nhập tên bài hát đã!");
+            const entry = { u: session.name, c: session.class, s: s, t: new Date().toLocaleString() };
+            db.push(entry);
+            localStorage.setItem('tp_music_final_v2', JSON.stringify(db));
+            session.history.push(s);
+            alert("Đã gửi đến CLB Truyền thông thành công! Cảm ơn bạn.");
+            document.getElementById('song-req').value = "";
+            refreshUI();
         }
     </script>
 </body>
